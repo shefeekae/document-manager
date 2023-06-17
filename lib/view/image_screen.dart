@@ -11,10 +11,11 @@ class ImageViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = title(file);
+    final name = title(file.path);
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.black87,
         title: Text(name),
       ),
       body: PhotoView(imageProvider: FileImage(file)),

@@ -1,7 +1,5 @@
-import 'dart:io';
-
-String title(FileSystemEntity entity, {bool showFileExtension = true}) {
-  final fileName = entity.path.split('/').last;
+String title(String path, {bool showFileExtension = true}) {
+  final fileName = path.split('/').last;
 
   if (showFileExtension) return fileName;
 

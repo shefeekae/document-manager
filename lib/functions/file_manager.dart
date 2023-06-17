@@ -1,9 +1,6 @@
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:document_manager_app/widgets/view_file.dart';
-import 'package:open_file/open_file.dart';
-
 class FileManager {
   static const int base = 1024;
   static const List<String> suffix = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -25,16 +22,20 @@ class FileManager {
 
   // check weather FileSystemEntity is File
   // return true if FileSystemEntity is File else returns false
-  static bool isFile(FileSystemEntity entity) {
-    return (entity is File);
+  static bool isFile(String path) {
+    return (path is File);
   }
 
 //Fetch documents from device storage (png,jpeg,jpg,pdf).
   static List<FileSystemEntity> fetchFiles() {
     Directory directory = Directory('/storage/emulated/0');
+    // Directory androidDirectory = Directory('/storage/emulated/0/Android/media');
 
+    // List<FileSystemEntity> androidMedia = androidDirectory.listSync();
     List<FileSystemEntity> folderList = directory.listSync();
     List<FileSystemEntity> fileList = [];
+
+    // fileList.add(androidMedia);
 
     for (final entity in folderList) {
       if (entity.path != '/storage/emulated/0/Android') {
@@ -43,52 +44,28 @@ class FileManager {
       }
     }
 
-    List<FileSystemEntity> files = filterFiles(fileList);
-    List<FileSystemEntity> finalList = [];
+    List<String> extensions = ['png', 'jpeg', 'jpg', 'pdf', 'xlsx'];
+    List<FileSystemEntity> files = filterFiles(fileList, extensions);
 
-    files
-        .map((file) => file.path.endsWith('pdf') ? finalList.add(file) : null)
-        .toList();
-
-    files
-        .map((file) => file.path.endsWith('png') ? finalList.add(file) : null)
-        .toList();
-
-    files
-        .map((file) => file.path.endsWith('jpeg') ? finalList.add(file) : null)
-        .toList();
-
-    files
-        .map((file) => file.path.endsWith('jpg') ? finalList.add(file) : null)
-        .toList();
-
-    files
-        .map((file) => file.path.endsWith('xlsx') ? finalList.add(file) : null)
-        .toList();
-
-    return finalList;
-  }
-
-  //Filter files and directories
-  static List<FileSystemEntity> filterFiles(List<FileSystemEntity> fileList) {
-    List<File> files = [];
-    for (final entity in fileList) {
-      if (entity is File) {
-        files.add(entity);
-      }
-    }
     return files;
   }
 
-  static Future<String> getSize(String path) async {
-    FileStat stat = await FileStat.stat(path);
-    double size = stat.size.toDouble();
-    List<String> sizeNotations = ['B', 'KB', 'GB', 'TB'];
-    int i = 0;
-    while (size > 1024) {
-      size = size / 1024;
-      i++;
+  //This method is used to filter out only the files with required
+  //extensions from the fetched files.
+  static List<FileSystemEntity> filterFiles(
+      List<FileSystemEntity> fileList, List<String> extensions) {
+    List<File> finalList = [];
+    for (final entity in fileList) {
+      if (entity is File) {
+        for (String extension in extensions) {
+          if (entity.path.endsWith(extension)) {
+            finalList.add(entity);
+            break;
+          }
+        }
+      }
     }
-    return "${size.toString()} ${sizeNotations[i]}";
+
+    return finalList;
   }
 }

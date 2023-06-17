@@ -1,12 +1,10 @@
 import 'dart:io';
+import 'package:document_manager_app/controller/file_controller.dart';
 import 'package:document_manager_app/functions/file_manager.dart';
+import 'package:document_manager_app/model/file_model.dart';
+import 'package:document_manager_app/view/add_screen.dart';
 import 'package:document_manager_app/view/image_screen.dart';
-
 import 'package:document_manager_app/view/pdf_screen.dart';
-import 'package:document_manager_app/widgets/subtitle.dart';
-import 'package:document_manager_app/widgets/title.dart';
-import 'package:document_manager_app/widgets/view_file.dart';
-
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -18,7 +16,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<FileSystemEntity> fileList = [];
+  List<FileModel> fileList = [];
+
+  FileController _fileController = FileController();
 
   //request permission method
   requestPermission() async {
@@ -34,7 +34,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     requestPermission();
+
     super.initState();
+  }
+
+  getAllFiles() async {
+    fileList = await _fileController.fetchFile();
   }
 
   void openPdfViewer(BuildContext context, File file) {
@@ -63,31 +68,46 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    fileList = FileManager.fetchFiles();
+    // fileList = _fileController.fetchFile();
     return Scaffold(
-      body: ListView.builder(
-        itemCount: fileList.length,
-        itemBuilder: (context, index) {
-          FileSystemEntity entity = fileList[index];
+      body: FutureBuilder(
+          future: getAllFiles(),
+          builder: (context, file) {
+            return ListView.builder(
+              itemCount: fileList.length,
+              itemBuilder: (context, index) {
+                FileModel file = fileList[index];
 
-          return Card(
-            child: ListTile(
-                leading: FileManager.isFile(entity)
-                    ? const Icon(Icons.feed_outlined)
-                    : const Icon(Icons.folder),
-                title: Text(title(entity)),
-                subtitle: subtitle(entity),
-                onTap: () => _openFile(File(entity.path))),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          // Navigator.of(context).push(MaterialPageRoute(
-          //   builder: (context) => AddScreen(),
-          // ));
-        },
+                return Card(
+                  child: ListTile(
+                      leading: FileManager.isFile(file.path)
+                          ? const Icon(Icons.feed_outlined)
+                          : const Icon(Icons.folder),
+                      title: Text(file.title),
+                      subtitle: Text(file.size),
+                      onTap: () => _openFile(File(file.path))),
+                );
+              },
+            );
+          }),
+      floatingActionButton: Container(
+        height: 50,
+        width: 140,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25), color: Colors.green[400]),
+        child: TextButton(
+          child: const Text(
+            "Create / Upload File",
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => AddScreen(
+                files: fileList,
+              ),
+            ));
+          },
+        ),
       ),
     );
   }

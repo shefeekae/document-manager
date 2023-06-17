@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:document_manager_app/widgets/title.dart';
 import 'package:flutter/material.dart';
-
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:pdfx/pdfx.dart';
 
 class PdfViewer extends StatefulWidget {
   const PdfViewer({super.key, required this.file});
@@ -14,17 +13,18 @@ class PdfViewer extends StatefulWidget {
 }
 
 class _PdfViewerState extends State<PdfViewer> {
-  late PdfViewerController _pdfViewerController;
+  late PdfController pdfController;
 
   @override
   void initState() {
-    _pdfViewerController = PdfViewerController();
+    pdfController =
+        PdfController(document: PdfDocument.openFile(widget.file.path));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final name = title(widget.file);
+    final name = title(widget.file.path);
 
     return Scaffold(
       appBar: AppBar(
@@ -37,9 +37,8 @@ class _PdfViewerState extends State<PdfViewer> {
       //   enableSwipe: true,
       // ),
 
-      body: SfPdfViewer.file(
-        widget.file,
-        controller: _pdfViewerController,
+      body: PdfView(
+        controller: pdfController,
       ),
     );
   }
