@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../model/file_model.dart';
 import '../widgets/load_image.dart';
+import '../widgets/search_textfield.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key, required this.files});

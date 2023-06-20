@@ -11,11 +11,9 @@ class FileListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ListView.separated(
+      child: ListView.builder(
+        itemExtent: 120,
         itemCount: fileList.length,
-        separatorBuilder: (context, index) => const Divider(
-          thickness: 1,
-        ),
         itemBuilder: (context, index) {
           FileModel file = fileList[index];
 

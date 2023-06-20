@@ -35,7 +35,7 @@ class PermissionScreen extends StatelessWidget {
                 height: size.height * 0.05,
               ),
               const Text(
-                "Please provide an access to your device storage, which is required for fetching files.",
+                "To provide you with the best experience, File Craft needs access to your device's storage. This will allow us to save and retrieve data for your convenience",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -45,7 +45,7 @@ class PermissionScreen extends StatelessWidget {
 
               //Allow Access Button
               MyButton(
-                backgroundColor: const Color.fromARGB(255, 28, 141, 86),
+                backgroundColor: const Color.fromARGB(255, 55, 126, 94),
                 onPressed: onPressed,
                 title: "Go to settings",
               ),

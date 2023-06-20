@@ -51,14 +51,10 @@ class FileManager {
   static List<FileSystemEntity> fetchFiles() {
     //Fetches all directories from device storage
     Directory directory = Directory('/storage/emulated/0');
+
     List<FileSystemEntity> folderList = directory.listSync();
 
     List<FileSystemEntity> fileList = [];
-
-    //Files in the android-media folder
-    // List<FileSystemEntity> tempList = [
-    //   Directory('/storage/emulated/0/Android/media')
-    // ];
 
     // folderList = [...folderList + tempList];
 

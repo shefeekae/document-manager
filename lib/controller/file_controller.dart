@@ -1,14 +1,15 @@
 import 'package:document_manager_app/functions/file_manager.dart';
 import 'package:document_manager_app/model/file_model.dart';
-import 'package:document_manager_app/provider/file_list_provider.dart';
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class FileController {
   //This method fetches a list of files and set it to File Model
-  List<FileModel> fetchFile(BuildContext context) {
-    List<FileModel> files = FileManager.fetchFiles().map((file) {
+  List<FileModel> fetchFile() {
+    List<FileModel> fetchedFiles = [];
+
+    List files = FileManager.fetchFiles();
+
+    fetchedFiles = files.map((file) {
       return FileModel(
         title: file.path.split('/').last.split('.').first,
         path: file.path,
@@ -18,9 +19,7 @@ class FileController {
       );
     }).toList();
 
-    Provider.of<FileProvider>(context).files = files;
-
-    return files;
+    return fetchedFiles;
   }
 
 //Method for getting modified date
