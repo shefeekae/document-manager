@@ -1,12 +1,11 @@
-import 'dart:io';
-import 'package:document_manager_app/widgets/title.dart';
+import 'package:document_manager_app/model/file_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
 class PdfViewer extends StatefulWidget {
   const PdfViewer({super.key, required this.file});
 
-  final File file;
+  final FileModel file;
 
   @override
   State<PdfViewer> createState() => _PdfViewerState();
@@ -24,19 +23,22 @@ class _PdfViewerState extends State<PdfViewer> {
 
   @override
   Widget build(BuildContext context) {
-    final name = title(widget.file.path);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(name),
+        leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            )),
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        title: Text(
+          widget.file.title,
+          style: const TextStyle(color: Colors.black),
+        ),
       ),
-
-      // body: PDFView(
-
-      //   filePath: file.path,
-      //   enableSwipe: true,
-      // ),
-
       body: PdfView(
         controller: pdfController,
       ),

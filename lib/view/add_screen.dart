@@ -1,12 +1,16 @@
-import 'dart:io';
-
-import 'package:document_manager_app/api/pdf_api.dart';
+import 'package:document_manager_app/controller/pdf_controller.dart';
+import 'package:document_manager_app/functions/validation.dart';
 import 'package:document_manager_app/model/file_model.dart';
+import 'package:document_manager_app/provider/validation.dart';
 import 'package:document_manager_app/view/overlay_screen.dart';
+import 'package:document_manager_app/widgets/change_file_container.dart';
+import 'package:document_manager_app/widgets/choose_file_container.dart';
+import 'package:document_manager_app/widgets/my_button.dart';
 import 'package:document_manager_app/widgets/my_textfield.dart';
-import 'package:document_manager_app/widgets/title.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import '../widgets/text_field_title.dart';
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key, required this.files});
@@ -18,19 +22,18 @@ class AddScreen extends StatefulWidget {
 }
 
 class _AddScreenState extends State<AddScreen> {
-  bool isVisible = true;
-
   final _formKey = GlobalKey<FormState>();
 
+  GeneratePdfController generatePdfController = GeneratePdfController();
   final TextEditingController titleController = TextEditingController();
-
   final TextEditingController descriptionController = TextEditingController();
-
-  final TextEditingController expiryDateController = TextEditingController();
 
   FileModel? pickedFile;
 
-  void showFileListOverlay(BuildContext context) {
+  Validation validate = Validation();
+
+//Shows an overlay screen with a list of images.
+  void showFileListOverlay() {
     showGeneralDialog(
       context: context,
       pageBuilder: (context, animation, secondaryAnimation) {
@@ -39,6 +42,8 @@ class _AddScreenState extends State<AddScreen> {
           onFileSelected: (file) {
             setState(() {
               pickedFile = file;
+              Provider.of<Validate>(context, listen: false)
+                  .checkFile(pickedFile);
             });
             Navigator.pop(context);
           },
@@ -47,140 +52,117 @@ class _AddScreenState extends State<AddScreen> {
     );
   }
 
+//This method calls the method for creating the pdf
   _createDocument() {
-    if (_formKey.currentState!.validate() && pickedFile != null) {
-      PdfApi.generatePdf(titleController.text, descriptionController.text,
-          File(pickedFile!.path));
-    }
+    generatePdfController.createDocument(_formKey, context, pickedFile,
+        titleController.text, descriptionController.text);
+    setState(() {
+      titleController.text = '';
+      descriptionController.text = '';
+      pickedFile = null;
+    });
+  }
+
+//Dispose off the text controllers
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.black87,
-        title: const Text("Create PDF"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              MyTextField(
-                controller: titleController,
-                labelText: 'Title',
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Please enter a title";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              MyTextField(
-                keyboardType: TextInputType.multiline,
-                controller: descriptionController,
-                labelText: 'Description',
-                maxLines: 8,
-                minLines: 5,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Please enter a description";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              MyTextField(
-                  controller: expiryDateController, labelText: "ExpiryDate"),
-              const SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Text(
-                  "Attach file:",
-                  style: GoogleFonts.lato(
-                      fontSize: 18,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.normal),
+    var size = MediaQuery.of(context).size;
+    return GestureDetector(
+      onTap: () {
+        //Dismissing the keyboard on tapping anywhere on the screen
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.black,
+              )),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                const Text(
+                  "Create Pdf",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              pickedFile == null
-                  ? Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: Colors.grey.shade600),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextButton(
-                        style: const ButtonStyle(
-                            splashFactory: NoSplash.splashFactory),
-                        onPressed: () => showFileListOverlay(context),
-                        child: Text(
-                          "Choose file",
-                          style: GoogleFonts.lato(
-                              fontSize: 15,
-                              color: Colors.blue[400],
-                              fontWeight: FontWeight.normal),
-                        ),
-                      ),
-                    )
-                  : Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade600),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey[200]),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            title(
-                              pickedFile?.path ?? "File name",
-                            ),
-                            style: GoogleFonts.lato(
-                                fontSize: 15,
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.normal),
-                          ),
-                          TextButton(
-                              style: const ButtonStyle(
-                                  splashFactory: NoSplash.splashFactory),
-                              onPressed: () => showFileListOverlay(context),
-                              child: Text(
-                                "Change file",
-                                style: GoogleFonts.lato(
-                                    fontSize: 15,
-                                    color: Colors.blue[400],
-                                    fontWeight: FontWeight.normal),
-                              )),
-                        ],
-                      ),
-                    ),
-              Visibility(
-                  visible: isVisible,
-                  child: Text("Please choose a file",
-                      style: GoogleFonts.lato(
-                          fontSize: 12,
-                          color: Colors.red,
-                          fontWeight: FontWeight.normal))),
-              const SizedBox(
-                height: 40,
-              ),
-              ElevatedButton(
-                  onPressed: _createDocument, child: const Text("Create"))
-            ],
+                const SizedBox(
+                  height: 20,
+                ),
+
+                //Title field
+                const TextFieldTitle(title: "Title:"),
+                MyTextField(
+                  controller: titleController,
+                  // labelText: 'Title',
+                  validator: (value) => validate.validateTitle(value),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+
+                //Description field
+                const TextFieldTitle(title: "Description:"),
+                MyTextField(
+                  keyboardType: TextInputType.multiline,
+                  controller: descriptionController,
+                  // labelText: 'Description',
+                  maxLines: 8,
+                  minLines: 5,
+                  validator: (value) => validate.validateDescription(value),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+
+                //Attach file field
+                const TextFieldTitle(title: "Attach file:"),
+                pickedFile == null
+                    ? ChooseFileContainer(onPressed: showFileListOverlay)
+                    : ChangeFileContainer(
+                        onPressed: showFileListOverlay, pickedFile: pickedFile),
+                Visibility(
+                    visible: !Provider.of<Validate>(context).isFileValid,
+                    child: const Padding(
+                      padding: EdgeInsets.only(left: 14),
+                      child: Text("Please choose a file",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.red,
+                              fontWeight: FontWeight.normal)),
+                    )),
+                SizedBox(
+                  height: size.height * .2,
+                ),
+                // Create button
+                MyButton(
+                  title: "Create",
+                  backgroundColor: const Color.fromARGB(255, 55, 126, 94),
+                  onPressed: _createDocument,
+                )
+              ],
+            ),
           ),
         ),
       ),

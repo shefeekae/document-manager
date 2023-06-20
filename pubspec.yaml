@@ -40,11 +40,12 @@ dependencies:
   photo_view: ^0.14.0
   pdfx: ^2.3.0
   pdf: ^3.10.4
-  google_fonts: ^5.0.0
+  provider: ^6.0.5
+  open_file: ^3.3.2
   
   
   
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -55,6 +56,16 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+  
+flutter_icons:
+  android: true
+  image_path: "assets/79EC12D2-28C4-4A5A-B375-0970B9D673D2.PNG"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/play_store_512.png"
+  
+  
+  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -68,8 +79,13 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    # - images/a_dot_burr.jpeg
+    - assets/xlsx-file.png
+    - assets/pdf-1512.png
+    - assets/avatar_writing-5kJdV6Aej-transformed.png
+    - assets/D3127FD0-E35F-4470-A366-85E79533F83F.PNG
+    - assets/unsupported image.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

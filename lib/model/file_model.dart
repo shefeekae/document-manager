@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 class FileModel {
   FileModel({
     required this.title,
@@ -6,7 +5,6 @@ class FileModel {
     required this.size,
     required this.documentType,
     required this.modifiedDate,
-    required this.description,
   });
 
   String title;
@@ -14,5 +12,4 @@ class FileModel {
   String size;
   String documentType;
   String modifiedDate;
-  String description;
 }
