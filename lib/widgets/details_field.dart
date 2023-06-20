@@ -30,6 +30,7 @@ class DetailsField extends StatelessWidget {
           Expanded(
             child: Text(
               fieldValue,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   color: Colors.grey.shade600,
