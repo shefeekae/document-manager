@@ -9,7 +9,6 @@ import 'package:document_manager_app/widgets/my_button.dart';
 import 'package:document_manager_app/widgets/my_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../widgets/text_field_title.dart';
 
 class AddScreen extends StatefulWidget {
@@ -87,7 +86,7 @@ class _AddScreenState extends State<AddScreen> {
         appBar: AppBar(
           leading: IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.of(context).pushReplacementNamed('/homeScreen');
               },
               icon: const Icon(
                 Icons.arrow_back,

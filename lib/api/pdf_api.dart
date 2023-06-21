@@ -96,7 +96,7 @@ class PdfApi {
     Directory directory = Directory('/storage/emulated/0');
 
     //Set a folder path where the file is to be saved.
-    String documentsFolderPath = '${directory.path}/Files';
+    String documentsFolderPath = '${directory.path}/FileCraft';
 
     //Creates the folder
     await Directory(documentsFolderPath).create(recursive: true);

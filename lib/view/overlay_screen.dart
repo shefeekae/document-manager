@@ -36,41 +36,51 @@ class FileListOverlay extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              Expanded(
-                child: Container(
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(7)),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    separatorBuilder: (context, index) => const Divider(
-                      thickness: 1,
+              Visibility(
+                visible: imageList.isNotEmpty,
+                replacement: const Center(
+                  child: Text(
+                    "No files",
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                child: Expanded(
+                  child: Container(
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(7)),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      separatorBuilder: (context, index) => const Divider(
+                        thickness: 1,
+                      ),
+                      itemCount: imageList.length,
+                      itemBuilder: (context, index) {
+                        FileModel? file = imageList[index];
+                        return ListTile(
+                          leading: SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    File(file.path),
+                                    fit: BoxFit.cover,
+                                  ))),
+                          title: Text(
+                            file.title,
+                            style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          onTap: () {
+                            if (onFileSelected != null) {
+                              onFileSelected!(file);
+                            }
+                          },
+                        );
+                      },
                     ),
-                    itemCount: imageList.length,
-                    itemBuilder: (context, index) {
-                      FileModel? file = imageList[index];
-                      return ListTile(
-                        leading: SizedBox(
-                            height: 40,
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.file(
-                                  File(file.path),
-                                  fit: BoxFit.cover,
-                                ))),
-                        title: Text(
-                          file.title,
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () {
-                          if (onFileSelected != null) {
-                            onFileSelected!(file);
-                          }
-                        },
-                      );
-                    },
                   ),
                 ),
               ),

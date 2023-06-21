@@ -16,8 +16,19 @@ class _PdfViewerState extends State<PdfViewer> {
 
   @override
   void initState() {
-    pdfController =
-        PdfController(document: PdfDocument.openFile(widget.file.path));
+    try {
+      pdfController =
+          PdfController(document: PdfDocument.openFile(widget.file.path));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.grey[200],
+          content: const Text(
+            "Document created successfully",
+            style:
+                TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+          )));
+    }
+
     super.initState();
   }
 

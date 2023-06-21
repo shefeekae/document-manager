@@ -56,14 +56,17 @@ class FileManager {
 
     List<FileSystemEntity> fileList = [];
 
-    // folderList = [...folderList + tempList];
-
     //Filter out the Android directory as we have no access to that directory
     for (final entity in folderList) {
       if (entity.path != '/storage/emulated/0/Android' &&
-          !entity.path.contains('/.')) {
+          !entity.path.contains('/.') &&
+          entity is! File) {
         final temporaryDirectory = Directory(entity.path);
         fileList = [...fileList + temporaryDirectory.listSync(recursive: true)];
+      } else if (entity.path != '/storage/emulated/0/Android' &&
+          !entity.path.contains('/.') &&
+          entity is File) {
+        fileList.add(entity);
       }
     }
     //Preferred extensions

@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
 
   //navigate to add screen
   navigateToAddScreen(List<FileModel> files) {
-    Navigator.of(context).pushNamed('/addScreen', arguments: files);
+    Navigator.of(context).pushReplacementNamed('/addScreen', arguments: files);
   }
 
 //Method for toggling grid view and list view
@@ -70,9 +70,9 @@ class _HomePageState extends State<HomePage> {
   Future<List<FileModel>> getAllFiles() async {
     await Future.delayed(const Duration(milliseconds: 500));
 
-    List<FileModel> fileList = _fileController.fetchFile();
+    List<FileModel> files = _fileController.fetchFile();
 
-    return fileList;
+    return files;
   }
 
   @override

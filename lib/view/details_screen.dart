@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:document_manager_app/api/pdf_api.dart';
 import 'package:document_manager_app/functions/file_manager.dart';
 import 'package:document_manager_app/model/file_model.dart';
+import 'package:document_manager_app/widgets/load_image.dart';
 import 'package:document_manager_app/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +69,7 @@ class DetailsScreen extends StatelessWidget {
                           ? Image.asset("assets/pdf-1512.png")
                           : FileManager.isXlsx(file.documentType)
                               ? Image.asset("assets/xlsx-file.png")
-                              : Image.file(File(file.path)),
+                              : loadImage(file.path),
                     ),
                   )),
               const SizedBox(
