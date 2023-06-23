@@ -1,19 +1,45 @@
 import 'dart:io';
-import 'dart:math' as math;
-import 'package:document_manager_app/model/file_model.dart';
+import 'dart:typed_data';
 import 'package:document_manager_app/provider/file_list_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-
-import '../constants/constants.dart';
+import '../model/file_model.dart';
 
 class FileManager {
-  // Format bytes to human readable string.
-  static String formatBytes(int bytes, [int precision = 2]) {
-    final base = (bytes == 0) ? 0 : (math.log(bytes) / math.log(1024)).floor();
-    final size = bytes / powBase[base];
-    final formattedSize = size.toStringAsFixed(precision);
-    return '$formattedSize ${suffix[base]}';
+  Box<FileModel> fileBox = Hive.box<FileModel>('fileBox');
+
+//Add file to the database
+  addFile({required FileModel file, required BuildContext context}) async {
+    final provider = Provider.of<FileProvider>(context, listen: false);
+
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    await fileBox.add(file);
+
+    provider.addFile(file);
+
+    //Save document to device storage
+    saveDocument(
+      name: file.title,
+      path: file.path,
+    );
+    scaffoldMessenger.showSnackBar(SnackBar(
+        backgroundColor: Colors.grey[200],
+        content: const Text(
+          "Document created successfully",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+        )));
+  }
+
+//Fetch all files from database
+  List<FileModel> getAllFiles({required BuildContext context}) {
+    final fileDb = Hive.box<FileModel>('fileBox');
+
+    List<FileModel> files = Provider.of<FileProvider>(context, listen: false)
+        .getAllFiles(fileDb.values);
+
+    return files;
   }
 
 //This method checks whether the file is a pdf or not
@@ -116,5 +142,28 @@ class FileManager {
       }
     }
     return imageList;
+  }
+
+  //This method saves the document to device storage.
+  static saveDocument({
+    required String name,
+    required String path,
+  }) async {
+    Uint8List bytes = File(path).readAsBytesSync();
+
+    //Fetches all directories for device storage.
+    Directory directory = Directory('/storage/emulated/0');
+
+    //Set a folder path where the file is to be saved.
+    String documentsFolderPath = '${directory.path}/FileCraft';
+
+    //Creates the folder
+    await Directory(documentsFolderPath).create(recursive: true);
+
+    //Set the file path of the file to be saved
+    final file = File('$documentsFolderPath/$name.pdf');
+
+    //Save the file
+    await file.writeAsBytes(bytes);
   }
 }

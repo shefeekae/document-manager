@@ -1,4 +1,4 @@
-import 'package:document_manager_app/model/file_model.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class Validate extends ChangeNotifier {
@@ -7,10 +7,9 @@ class Validate extends ChangeNotifier {
   bool isFileValid = true;
 
 // Vailidation method for choose file field
-  checkFile(FileModel? pickedFile) {
+  checkFile(PlatformFile? pickedFile) {
     if (pickedFile == null) {
       chooseFile = "Please choose a file";
-      notifyListeners();
       isFileValid = false;
       notifyListeners();
     } else {

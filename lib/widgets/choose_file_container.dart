@@ -1,4 +1,6 @@
+import 'package:document_manager_app/provider/validation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChooseFileContainer extends StatelessWidget {
   const ChooseFileContainer({super.key, required this.onPressed});
@@ -11,7 +13,9 @@ class ChooseFileContainer extends StatelessWidget {
       height: 120,
       decoration: BoxDecoration(
         color: Colors.grey[200],
-        border: Border.all(color: Colors.grey.shade400),
+        border: Provider.of<Validate>(context).isFileValid
+            ? Border.all(color: Colors.grey.shade400)
+            : Border.all(color: Colors.red),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextButton(

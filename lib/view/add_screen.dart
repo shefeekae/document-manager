@@ -1,12 +1,13 @@
-import 'package:document_manager_app/controller/pdf_controller.dart';
+import 'package:document_manager_app/controller/file_controller.dart';
 import 'package:document_manager_app/functions/validation.dart';
 import 'package:document_manager_app/model/file_model.dart';
+import 'package:document_manager_app/provider/file_picker_provider.dart';
 import 'package:document_manager_app/provider/validation.dart';
-import 'package:document_manager_app/view/overlay_screen.dart';
 import 'package:document_manager_app/widgets/change_file_container.dart';
 import 'package:document_manager_app/widgets/choose_file_container.dart';
 import 'package:document_manager_app/widgets/my_button.dart';
 import 'package:document_manager_app/widgets/my_textfield.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/text_field_title.dart';
@@ -23,43 +24,62 @@ class AddScreen extends StatefulWidget {
 class _AddScreenState extends State<AddScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  GeneratePdfController generatePdfController = GeneratePdfController();
+  final FileController fileController = FileController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-
-  FileModel? pickedFile;
 
   Validation validate = Validation();
 
 //Shows an overlay screen with a list of images.
-  void showFileListOverlay() {
-    showGeneralDialog(
-      context: context,
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return FileListOverlay(
-          files: widget.files,
-          onFileSelected: (file) {
-            setState(() {
-              pickedFile = file;
-              Provider.of<Validate>(context, listen: false)
-                  .checkFile(pickedFile);
-            });
-            Navigator.pop(context);
-          },
-        );
-      },
-    );
+  // void showFileListOverlay() {
+  //   showGeneralDialog(
+  //     context: context,
+  //     pageBuilder: (context, animation, secondaryAnimation) {
+  //       return FileListOverlay(
+  //         files: widget.files,
+  //         onFileSelected: (file) {
+  //           setState(() {
+  //             pickedFile = file;
+  //             Provider.of<Validate>(context, listen: false)
+  //                 .checkFile(pickedFile);
+  //           });
+  //           Navigator.pop(context);
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+//This method calls the method for adding the document
+  addDocument() {
+    if (_formKey.currentState!.validate()) {
+      PlatformFile? pickedFile =
+          Provider.of<FilePickerProvider>(context, listen: false).pickedFile;
+
+      Provider.of<Validate>(context, listen: false).checkFile(pickedFile);
+
+      if (Provider.of<Validate>(context, listen: false).isFileValid) {
+        fileController.addFile(
+            formKey: _formKey,
+            context: context,
+            title: titleController.text,
+            description: descriptionController.text,
+            path: Provider.of<FilePickerProvider>(context, listen: false)
+                .pickedFile!
+                .path!);
+
+        Provider.of<FilePickerProvider>(context, listen: false).refreshScreen();
+        setState(() {
+          titleController.text = '';
+          descriptionController.text = '';
+        });
+      }
+    }
   }
 
-//This method calls the method for creating the pdf
-  _createDocument() {
-    generatePdfController.createDocument(_formKey, context, pickedFile,
-        titleController.text, descriptionController.text);
-    setState(() {
-      titleController.text = '';
-      descriptionController.text = '';
-      pickedFile = null;
-    });
+//show File picker
+  showFilePicker() {
+    Provider.of<FilePickerProvider>(context, listen: false).pickFile();
   }
 
 //Dispose off the text controllers
@@ -87,6 +107,10 @@ class _AddScreenState extends State<AddScreen> {
           leading: IconButton(
               onPressed: () {
                 Navigator.of(context).pushReplacementNamed('/homeScreen');
+                Provider.of<FilePickerProvider>(context, listen: false)
+                    .refreshScreen();
+                Provider.of<Validate>(context, listen: false).isFileValid =
+                    true;
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -102,7 +126,7 @@ class _AddScreenState extends State<AddScreen> {
             child: ListView(
               children: [
                 const Text(
-                  "Create Pdf",
+                  "Add files",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
                   textAlign: TextAlign.center,
                 ),
@@ -137,14 +161,17 @@ class _AddScreenState extends State<AddScreen> {
 
                 //Attach file field
                 const TextFieldTitle(title: "Attach file:"),
-                pickedFile == null
-                    ? ChooseFileContainer(onPressed: showFileListOverlay)
+                Provider.of<FilePickerProvider>(context).pickedFile == null
+                    ? ChooseFileContainer(
+                        onPressed: showFilePicker,
+                      )
                     : ChangeFileContainer(
-                        onPressed: showFileListOverlay, pickedFile: pickedFile),
+                        onPressed: showFilePicker,
+                      ),
                 Visibility(
                     visible: !Provider.of<Validate>(context).isFileValid,
                     child: const Padding(
-                      padding: EdgeInsets.only(left: 14),
+                      padding: EdgeInsets.only(left: 14, top: 5),
                       child: Text("Please choose a file",
                           style: TextStyle(
                               fontSize: 12,
@@ -156,9 +183,9 @@ class _AddScreenState extends State<AddScreen> {
                 ),
                 // Create button
                 MyButton(
-                  title: "Create",
+                  title: "Add file",
                   backgroundColor: const Color.fromARGB(255, 55, 126, 94),
-                  onPressed: _createDocument,
+                  onPressed: addDocument,
                 )
               ],
             ),

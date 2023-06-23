@@ -1,11 +1,10 @@
-import 'package:document_manager_app/api/pdf_api.dart';
 import 'package:document_manager_app/functions/file_manager.dart';
 import 'package:document_manager_app/model/file_model.dart';
 import 'package:document_manager_app/widgets/load_image.dart';
 import 'package:document_manager_app/widgets/my_button.dart';
 import 'package:flutter/material.dart';
-
 import '../widgets/details_field.dart';
+import 'package:open_file/open_file.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({super.key, required this.file});
@@ -20,6 +19,10 @@ class DetailsScreen extends StatelessWidget {
     Navigator.of(context).pushNamed('/imageViewer', arguments: file);
   }
 
+  openXlFile(String filePath) {
+    OpenFile.open(filePath);
+  }
+
   openFile(FileModel file, BuildContext context) {
     if (file.path.endsWith('pdf')) {
       openPdfViewer(context, file);
@@ -30,7 +33,7 @@ class DetailsScreen extends StatelessWidget {
     } else if (file.path.endsWith('jpeg')) {
       openImageViewer(context, file);
     } else if (file.documentType == 'xlsx') {
-      PdfApi.openFile(file.path);
+      openXlFile(file.path);
     }
   }
 
@@ -87,6 +90,13 @@ class DetailsScreen extends StatelessWidget {
                       DetailsField(
                         fieldName: "Name :",
                         fieldValue: file.title,
+                      ),
+                      const Divider(
+                        thickness: 1,
+                      ),
+                      DetailsField(
+                        fieldName: "Description :",
+                        fieldValue: file.description,
                       ),
                       const Divider(
                         thickness: 1,

@@ -1,16 +1,22 @@
-import 'dart:io';
+import 'package:document_manager_app/provider/file_picker_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import '../model/file_model.dart';
+import 'package:provider/provider.dart';
+import '../functions/file_manager.dart';
+import 'load_image.dart';
 
 class ChangeFileContainer extends StatelessWidget {
-  const ChangeFileContainer(
-      {super.key, required this.onPressed, required this.pickedFile});
+  const ChangeFileContainer({
+    super.key,
+    required this.onPressed,
+  });
 
   final Function()? onPressed;
-  final FileModel? pickedFile;
 
   @override
   Widget build(BuildContext context) {
+    PlatformFile file = Provider.of<FilePickerProvider>(context).pickedFile!;
+
     return Container(
       height: 120,
       decoration: BoxDecoration(
@@ -25,10 +31,20 @@ class ChangeFileContainer extends StatelessWidget {
               height: 30,
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(5),
-                  child: Image.file(File(pickedFile!.path)))),
+                  child: FileManager.isPdf(file.extension!)
+                      ? Image.asset(
+                          "assets/pdf-1512.png",
+                          fit: BoxFit.cover,
+                        )
+                      : FileManager.isXlsx(file.extension!)
+                          ? Image.asset(
+                              "assets/xlsx-file.png",
+                              fit: BoxFit.cover,
+                            )
+                          : loadImage(file.path!))),
 
           Text(
-            pickedFile?.title ?? "File name",
+            file.name,
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
