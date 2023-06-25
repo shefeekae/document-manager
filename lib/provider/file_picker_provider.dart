@@ -37,7 +37,7 @@ class FilePickerProvider extends ChangeNotifier {
 
   // //request permission method
   checkPermission() async {
-    PermissionStatus status = await Permission.storage.status;
+    PermissionStatus status = await Permission.manageExternalStorage.status;
     if (status.isPermanentlyDenied) {
       hasPermission = true;
       notifyListeners();

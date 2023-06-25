@@ -20,7 +20,9 @@ class DetailsScreen extends StatelessWidget {
   }
 
   openXlFile(String filePath) {
-    OpenFile.open(filePath);
+    OpenFile.open(
+      filePath,
+    );
   }
 
   openFile(FileModel file, BuildContext context) {
